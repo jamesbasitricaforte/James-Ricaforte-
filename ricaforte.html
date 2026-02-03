@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="james.js"></script>
+    <title>JAMES MICHAEL RICAFORTE PAGE</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;      
+            justify-content: center;  
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #85beec; 
+        }
+
+        button, input, p {
+            font-size: 18px; 
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px; 
+        }
+
+        button {
+            background-color: #4CAF50; 
+            color: rgb(72, 14, 231); 
+            border: none;
+        }
+
+        button:hover {
+            background-color: #45a049; 
+        }
+
+        input {
+            border: 1px solid #13e27a; 
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+        }
+
+        #hoverText {
+            font-size: 30px;
+            color: #110a0a; 
+        }
+
+        #hoverText:hover {
+            color: #007BFF; 
+        }
+
+        #output {
+            font-size: 30px; 
+            font-weight: bold;
+            color: #080000; 
+        }
+    </style>
+</head>
+<body>
+
+    <button onclick="sayHello()">Say Hello</button>
+    <br><br>
+
+    <input type="text" id="userInput" placeholder="Type something">
+    <button onclick="showInput()">Show Input</button>
+
+    <p id="output"></p>
+
+    <p id="hoverText">Hover over me!</p>   
+
+    <script>
+        function sayHello() {
+            alert("Hello, everyone!");
+        }
+
+        function showInput() {
+            let text = document.getElementById("userInput").value;
+            document.getElementById("output").innerText = text;
+        }
+    </script>
+
+</body>
+</html>
