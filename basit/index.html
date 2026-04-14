@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Directory | AJAX-PHP Lab</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 28px;
+        }
+
+        h2 {
+            color: #2d3748;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #4a5568;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #2d3748;
+            background: #fff;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="number"]::placeholder {
+            color: #a0aec0;
+        }
+
+        .hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        button.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        @keyframes spin {
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        #result {
+            margin-top: 24px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        #result.success {
+            background: #f0fff4;
+            border-color: #48bb78;
+        }
+
+        #result.error {
+            background: #fff5f5;
+            border-color: #fc8181;
+        }
+
+        .result-content {
+            text-align: center;
+            width: 100%;
+        }
+
+        .result-placeholder {
+            color: #a0aec0;
+            font-size: 0.95rem;
+        }
+
+        .user-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-size: 32px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .user-info {
+            text-align: center;
+        }
+
+        .user-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .user-role {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #edf2f7;
+            color: #4a5568;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">👤</div>
+            <h2>User Directory</h2>
+            <p class="subtitle">Find team member information instantly</p>
+        </div>
+
+        <div class="input-group">
+            <label for="userId">User ID</label>
+            <input type="number" id="userId" placeholder="Enter ID (1-3)" min="1" max="3">
+            <div class="hint">
+                <span>ℹ️</span>
+                <span>Available IDs: 1, 2, or 3</span>
+            </div>
+        </div>
+
+        <button onclick="getUserData()" id="submitBtn">
+            <span class="status-indicator" style="display: none;"></span>
+            Get Information
+        </button>
+
+        <div id="result">
+            <div class="result-content">
+                <span class="result-placeholder">User details will appear here...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getUserData() {
+            const id = document.getElementById('userId').value;
+            const resultDiv = document.getElementById('result');
+            const submitBtn = document.getElementById('submitBtn');
+            const statusIndicator = submitBtn.querySelector('.status-indicator');
+
+            // Reset states
+            resultDiv.className = '';
+            resultDiv.innerHTML = '<div class="result-content"><span class="result-placeholder">Loading...</span></div>';
+
+            if (!id) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <div class="result-content">
+                        <div class="error-message">
+                            <span>⚠️</span>
+                            <span>Please enter a User ID</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Add loading state
+            submitBtn.classList.add('loading');
+            submitBtn.innerHTML = 'Fetching...';
+            statusIndicator.style.display = 'inline-block';
+
+            // Initiating the AJAX request to the PHP backend
+            fetch(`process.php?id=${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Remove loading state
+                    submitBtn.classList.remove('loading');
+                    submitBtn.innerHTML = '<span class="status-indicator" style="display: none;"></span>Get Information';
+
+                    if (data.error) {
+                        resultDiv.className = 'error';
+                        resultDiv.innerHTML = `
+                            <div class="result-content">
+                                <div class="error-message">
+                                    <span>❌</span>
+                                    <span>${data.error}</span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.className = 'success';
+                        resultDiv.innerHTML = `
+                            <div class="result-content user-card">
+                                <div class="user-avatar">${data.name.charAt(0).toUpperCase()}</div>
+                                <div class="user-info">
+                                    <div class="user-name">${data.name}</div>
+                                    <span class="user-role">${data.role}</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    submitBtn.classList.remove('loading');
+                    submitBtn.innerHTML = '<span class="status-indicator" style="display: none;"></span>Get Information';
+                    
+                    resultDiv.className = 'error';
+                    resultDiv.innerHTML = `
+                        <div class="result-content">
+                            <div class="error-message">
+                                <span>🔌</span>
+                                <span>An error occurred while fetching data</span>
+                            </div>
+                        </div>
+                    `;
+                });
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('userId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getUserData();
+            }
+        });
+    </script>
+</body>
+</html>
